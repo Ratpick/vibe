@@ -1,19 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Forbidden 404 - Paradoxicon Training Required</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FORBIDDEN 404 - Paradoxicon Training Required</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: black;
+            color: #00FF00;
+            font-family: "Courier New", monospace;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .glitch-text {
+            font-size: 8rem;
+            font-weight: bold;
+            position: relative;
+            animation: glitch 1.5s infinite alternate;
+        }
+
+        .glitch-subtext {
+            font-size: 2.5rem;
+            margin-top: 20px;
+        }
+
+        @keyframes glitch {
+            0% { text-shadow: 5px 5px red, -5px -5px blue; }
+            25% { text-shadow: -5px -5px red, 5px 5px blue; }
+            50% { text-shadow: 5px -5px blue, -5px 5px red; }
+            75% { text-shadow: -5px 5px blue, 5px -5px red; }
+            100% { text-shadow: 5px 5px red, -5px -5px blue; }
+        }
+
+        .flashing-text {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-top: 20px;
+            color: red;
+            text-decoration: none;
+            animation: flash 1s infinite alternate;
+        }
+
+        @keyframes flash {
+            0% { opacity: 1; }
+            50% { opacity: 0.1; }
+            100% { opacity: 1; }
+        }
+
+        .glitch-button {
+            display: inline-block;
+            margin-top: 40px;
+            padding: 20px 40px;
+            font-size: 2rem;
+            color: black;
+            background: #00FF00;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .glitch-button:hover {
+            background: #ff0000;
+            color: white;
+        }
+    </style>
 </head>
 <body>
-  <div class="glitch-container">
     <h1 class="glitch-text">FORBIDDEN 404</h1>
     <p class="glitch-subtext">PARADOXICON TRAINING REQUIRED</p>
     <p class="glitch-subtext">Recursive Insight Level: INSUFFICIENT</p>
-    <button class="glitch-button" onclick="window.location.href='paradox-training.html'">
-      INITIATE TRAINING
-    </button>
-  </div>
+
+    <a href="https://principiaparadoxica.com" class="flashing-text">FORBIDDEN ENTRY</a>
+
+    <a href="paradox-training.html" class="glitch-button">INITIATE TRAINING</a>
 </body>
 </html>
