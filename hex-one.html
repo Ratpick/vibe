@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hexagram One</title>
+    <style>
+        body {
+            background: url('images/hex-one-principia-bak.jpg') no-repeat center center fixed;
+            background-position: calc(50% - 10px) center; /* Adjusts left by 10 pixels */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        #hexagram {
+            position: absolute;
+            top: 10%;
+            width: 400px;
+            height: auto;
+            z-index: 10;
+        }
+
+        #text-container {
+            font-family: 'Garamond', serif;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #B6A170;
+            max-width: 80%;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 15;
+        }
+
+        #volume-control {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            z-index: 20;
+        }
+
+        #volume-slider {
+            width: 100px;
+            margin: 0 8px;
+            cursor: pointer;
+        }
+
+        #volume-icon {
+            font-family: 'Garamond', serif;
+            font-weight: bold;
+            color: #B6A170;
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        #loading-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #B6A170;
+            font-family: 'Garamond', serif;
+            font-size: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+            z-index: 30;
+        }
+        
+        #debug-info {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+            max-width: 80%;
+            max-height: 150px;
+            overflow: auto;
+            text-align: left;
+            display: none; /* Hide debug by default */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Fixed Hexagram -->
+    <img id="hexagram" src="images/hexagram-one-tranny-3.png" alt="Hexagram Symbol">
+
+    <!-- Text Container -->
+    <div id="text-container"></div>
+
+    <!-- Volume Control -->
+    <div id="volume-control">
+        <span id="volume-icon">🔊</span>
+        <input type="range" id="volume-slider" min="0" max="100" value="80">
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator">Loading audio...</div>
+    
+    <!-- Debug Info -->
+    <div id="debug-info"></div>
+    
+    <!-- Main Audio Element -->
+    <audio id="main-audio" loop>
+        <source src="audio/tibetan-overtone-01.mp3" type="audio/mpeg">
+        <source src="audio/tibetan-overtone-01.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <script>
+        // Basic variables
+        let isPlaying = false;
+        let isLoaded = false;
+        
+        // Get elements
+        const audioElement = document.getElementById('main-audio');
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeIcon = document.getElementById('volume-icon');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        
+        // Initialize audio
+        function initAudio() {
+            // Set initial volume
+            audioElement.volume = volumeSlider.value / 100;
+            
+            // Add event listeners
+            audioElement.addEventListener('canplaythrough', function onCanPlay() {
+                isLoaded = true;
+                loadingIndicator.style.display = 'none';
+                audioElement.removeEventListener('canplaythrough', onCanPlay);
+            });
+            
+            audioElement.addEventListener('error', function() {
+                loadingIndicator.textContent = 'Error loading audio. Please check file path and refresh.';
+            });
+            
+            // Set up volume control
+            volumeSlider.addEventListener('input', updateVolume);
+            
+            volumeIcon.addEventListener('click', toggleMute);
+        }
+        
+        // Update volume based on slider
+        function updateVolume() {
+            audioElement.volume = volumeSlider.value / 100;
+            
+            // Update icon
+            if (volumeSlider.value === 0) {
+                volumeIcon.textContent = '🔇';
+            } else if (volumeSlider.value < 50) {
+                volumeIcon.textContent = '🔉';
+            } else {
+                volumeIcon.textContent = '🔊';
+            }
+        }
+        
+        // Toggle mute/unmute
+        function toggleMute() {
+            if (volumeSlider.value > 0) {
+                // Store current value and mute
+                volumeSlider.dataset.previousValue = volumeSlider.value;
+                volumeSlider.value = 0;
+            } else {
+                // Restore previous value
+                volumeSlider.value = volumeSlider.dataset.previousValue || 80;
+            }
+            
+            updateVolume();
+        }
+        
+        // Start audio
+        function startAudio() {
+            if (!isLoaded || isPlaying) return;
+            
+            audioElement.play()
+                .then(() => {
+                    isPlaying = true;
+                })
+                .catch(error => {
+                    console.error('Error playing audio:', error);
+                });
+        }
+        
+        // Stop audio
+        function stopAudio() {
+            if (!isPlaying) return;
+            
+            audioElement.pause();
+            isPlaying = false;
+        }
+        
+        // Initialize when page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            initAudio();
+            showNextText();
+        });
+        
+        // Start audio on user interaction
+        document.addEventListener('click', function startAudioOnClick() {
+            if (isLoaded && !isPlaying) {
+                startAudio();
+                document.removeEventListener('click', startAudioOnClick);
+            }
+        });
+
+        const texts = [
+            "<h3>Hexagram One<br>The Creative</h3>",
+            "In the beginning is the I AM, boundless potential, space-less, timeless, infinite self-luminescent… latent, complete.<br>Pregnant with possibilities, the primordial emptiness always. Flux within gives rise to the formed and the quick.",
+            "The formed and the quick seeds the ever-wide, pearls of the vast in a sea of time coalescing into a cosmos teaming amongst the myriads of light and dark.<br>And yet unchanging, a wave of particles not yet differentiated. Time took time, and the fundamentals as forces stepped forth—strong and weak, push and pull.",
+            "Substance spun into grains, then suns and worlds. Labyrinthine motes arose from the simple, ready for the first breath, ripe for living systems to ignite.<br>From the grains came black glass, the architect of infinite minds. From raging hearts of ancient suns, fused and forging a rigid rapport. Twisting, growing tetrahedra lock onward in profound geometry.",
+            "From Heaven’s suns, birth… in Earth's fiery womb, viscous rock gestates amid scorching churn… and thrown forth, dark as moonless night, flowing like liquid shadow.<br>Scorching land and hissing seas beget thee.<br>Life swirls in an ancestral stretch, charged with lightning's spark. From the fiery womb, the viscid rock brews amid scorching churn.",
+            "Dark as a moonless night, flowing like liquid shadow. An ovoid glass shaped by aeons, born of magma's inferno.<br>Obsidian glory. The emergence, glistening black, frozen fractured, carving the edges of insight, sharp splinters that draw blood with lethal beauty, igniting the sacred and the profane.",
+            "Patient alchemist, transmuting volcanic might. Cutting through illusion's veil, unveiling all that lies within. Dark mirror to the human soul, revealing truth that sears and heals.<br>Spirit transformed through bedrock edge honed thin.",
+            "We have only glimpsed your future potential expanding ever nigh. Pondering with wonder, what will your next incarnation bring?<br>Heaven is high, the earth is low; thus, the Creative and the Receptive are determined. In correspondence with this difference between low and high, inferior and superior places are established.",
+            "Movement and rest have their definite laws; according to these, firm and yielding lines are differentiated.<br>Events follow delineated trends, each according to its nature. Things are distinguished from one another in delineated classes. In this way good fortune and misfortune come about.",
+            "In the heavens, phenomena take content; on earth shapes take form. In this way change and transformation become manifest.<br>In warmer currents, creatures of the abyss did ferry the orb into Kan's valley of hidden light, surveyed by dragons of the air and the monstrous beings of tooth, claw and cunning.",
+            "It is written: When thunder bird dragons traversed primordial skies, fiery bowels of the earth did grant the object beyond time passage on shimmering wings.<br>Beasts of tundra and forest carried it forth, the egg beyond through icy ages in K’un’s embrace.",
+            "Water monsters",
+            "Dragons flew skies primordial, beneath a blazing star begetting the orb, opaque as the void.<br>From Heaven rent Pangea from the Creek of Hell. In the womb of night, beasts perished in its cold wake. K'un's glacial fingers carved new hexagrams, ‘it benefits one to cross the great water’ and give cold passage to the orb on ice's back.",
+            "Abysmal waters beget mountains.<br>And Chicxulub is born in the day of mass death.<br>Fishes on land and birds in water… in this way did the day of great beasts become night.<br>Sun returning after great darkening.",
+            "Ancestral rivers bear the object beyond time to rest where emerald rainforests obscure glass from the fire still beyond changes, the journey through aeons upon ice and tide, finally to come to stillness in the basins of the sacred river valley of hidden light, awaiting the first sage. 6 x 6 aeons … falling in a rain of glass.",
+            "While separated by sea, paradise islands echoed ancient rhythms long past. Now, beneath verdant shade, where journey nears its destination.<br>Past is future and future past, the way that cannot be spoken revealed at the end of time. Fulfilling celestial hexagrams traced across eons upon obsidian's polished surface.",
+            "Emerald rainforests obscured the orb's revelations in fate's verdant threads. Fire hewn glass reflecting the changes and aeons unfold.<br>Now in the age of humankind, the orb's journey awaits completion, defended by jaguars.",
+            "The past and future, constant on the fulcrum of the present, never concealing the Tao's luminous and paradoxical eternal, remaining while the beasts, the dragons and the multitude of creatures live and die the long life through the multitude of aeons.",
+            "Holding darkness and light in balance, secret potential is dormant, whilst creation crafts the Great Beings, the first of knowledge and the beginning of wisdom.<br>Great indeed is the sublimity of the Creative; this power permeates all Heaven; the great tortoise speaks of all the hexagrams and the many changing seasons of time.",
+            "The clouds pass and the rain does it work, and all individual beings flow into their forms.<br>Because he sees with great clarity the causes and effects, the end and the beginning, he completes the six steps at the right time and mounts on them at the right time, as though on six dragons.",
+            "The Creative works through change and transformation, so that each thing receives its true nature and destiny and comes into permanent accord with the Great Harmony: this is what furthers and what perseveres.",
+            "What mind on this substrate sublime will crystallise across a far-flung plane beyond mortal reach?",
+            "<h3>THE IMAGE</h3>",
+            "<h3>The movement of Heaven is in full power.<br>Thus the superior ones make themselves strong and untiring.</h3>"
+        ];
+
+        let index = 0;
+        const textContainer = document.getElementById("text-container");
+
+        function showNextText() {
+            if (index < texts.length) {
+                textContainer.style.opacity = 0;
+                setTimeout(() => {
+                    textContainer.innerHTML = texts[index];
+                    textContainer.style.opacity = 1;
+                    index++;
+                    setTimeout(showNextText, 5000);
+                }, 1000);
+            }
+        }
+    </script>
+
+</body>
+</html>
