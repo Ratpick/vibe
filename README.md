@@ -1,7 +1,7 @@
 
 # Hexagram One – Mythopoetic Teaser Node
 
-Originally developed as a hidden narrative seed for the Gamma-built prototype site, this standalone HTML/CSS/JS project is a symbolic “easter egg” that blossoms into a rich audiovisual meditation on Hexagram One: The Creative.
+Originally developed as a hidden narrative seed for the Gamma-built prototype site, this standalone HTML/CSS/JS project is a symbolic “easter egg” that blossoms into a rich audiovisual meditation on the opening of the Zhou yi, Hexagram One: The Creative.
 
 ## Intent
 
